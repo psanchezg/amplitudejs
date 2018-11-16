@@ -912,7 +912,16 @@ var AmplitudeVisualSync = function () {
     */
 				if (_config2.default.active_metadata[info] != undefined) {
 					if (imageMetaDataKeys.indexOf(info) >= 0) {
-						songInfoElements[i].setAttribute('src', _config2.default.active_metadata[info]);
+						if (songInfoElements[i].nodeName == 'IMG') {
+							songInfoElements[i].setAttribute('src', _config2.default.active_metadata[info]);
+						} else {
+							// BACKGROUND STYLE
+							if (songInfoElements[i].style.background) {
+								songInfoElements[i].style.background = songInfoElements[i].style.background.replace('url("")', 'url("' + _config2.default.active_metadata[info] + '")');
+							} else {
+								songInfoElements[i].style.backgroundImage = "url('" + _config2.default.active_metadata[info] + "')";
+							}
+						}
 					} else {
 						songInfoElements[i].innerHTML = _config2.default.active_metadata[info];
 					}

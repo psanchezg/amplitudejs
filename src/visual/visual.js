@@ -222,8 +222,17 @@ let AmplitudeVisualSync = (function() {
 				*/
 				if( config.active_metadata[info] != undefined ){
 					if( imageMetaDataKeys.indexOf( info ) >= 0 ){
-						songInfoElements[i].setAttribute('src', config.active_metadata[info]);
-					}else{
+                        if( songInfoElements[i].nodeName == 'IMG' ){
+                            songInfoElements[i].setAttribute('src', config.active_metadata[info]);
+                        }else{
+                            // BACKGROUND STYLE
+                            if( songInfoElements[i].style.background ){
+                                songInfoElements[i].style.background = songInfoElements[i].style.background.replace('url("")', 'url("' + config.active_metadata[info] + '")');
+                            }else{
+                                songInfoElements[i].style.backgroundImage = "url('" + config.active_metadata[info] + "')";
+                            }
+                        }
+                    }else{
 						songInfoElements[i].innerHTML = config.active_metadata[info];
 					}
 				}else{
