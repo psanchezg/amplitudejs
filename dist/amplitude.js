@@ -105,6 +105,7 @@ return /******/ (function(modules) { // webpackBootstrap
  * @property {object} 	config.callbacks								- The user can pass a JSON object with a key => value store of callbacks to be run at certain events.
  * @property {array} 		config.songs										- Contains all of the songs the user has passed to Amplitude to use.
  * @property {object} 	config.playlists								- Contains all of the playlists the user created.
+ * @property {object} 	config.playlist_markups								- Contains the HTML markup for the playlists before update.
  * @property {object} 	config.start_song 							- The index of the song that AmplitudeJS should start with.
  * @property {object} 	config.shuffled_playlists				- Will contain shuffled playlists.
  * @property {string} 	config.starting_playlist 				- The starting playlist the player will intiialize to.
@@ -154,6 +155,8 @@ module.exports = {
   songs: [],
 
   playlists: {},
+
+  playlist_markups: {},
 
   start_song: '',
 
@@ -1723,6 +1726,70 @@ var AmplitudeVisualSync = function () {
 	}
 
 	/**
+  * Sets the playlist meta data for songs
+  */
+	function syncPlaylistMetaData() {
+		/*
+  Define the image meta data keys. These are managed separately
+  since we aren't actually changing the inner HTML of these elements.
+  */
+		var imageMetaDataKeys = ['cover_art_url', 'station_art_url', 'podcast_episode_cover_art_url'];
+
+		/*
+  	These are the ignored keys that we won't be worrying about displaying.
+  	Every other key in the song object can be displayed.
+  */
+		var ignoredKeys = ['url', 'live'];
+
+		/*
+  	Get all of the song info elements
+  */
+		var playlistRepeaterElements = document.querySelectorAll('[amplitude-playlist-repeater]');
+
+		/*
+  	Iterate over all of the song info elements. We will either
+  	set these to the new values, or clear them if the active song
+  	doesn't have the info set.
+  */
+		var index, info, idx, aux2, newinner, finalDom, songInfoElements;
+		for (var i = 0; i < playlistRepeaterElements.length; i++) {
+			if (playlistRepeaterElements[i].getAttribute('amplitude-playlist-repeater') != null) {
+				if (_config2.default.playlist_markups[index] == undefined) {
+					_config2.default.playlist_markups[index] = playlistRepeaterElements[i].innerHTML;
+				}
+				var inner = _config2.default.playlist_markups[index];
+				var dom = document.createRange().createContextualFragment(inner);
+				newinner = inner;
+				playlistRepeaterElements[i].innerHTML = '';
+				index = playlistRepeaterElements[i].getAttribute('amplitude-playlist-repeater');
+				if (_config2.default.playlists[index] != undefined) {
+					finalDom = [];
+					songInfoElements = dom.querySelectorAll('[amplitude-song-info]');
+					for (var j = 0; j < _config2.default.playlists[index].length; j++) {
+						idx = _config2.default.playlists[index][j];
+						for (var k = 0; k < songInfoElements.length; k++) {
+							info = songInfoElements[k].getAttribute('amplitude-song-info');
+							if (_config2.default.songs[idx][info] != undefined) {
+								if (imageMetaDataKeys.indexOf(info) >= 0) {
+									aux2 = songInfoElements[k].outerHTML;
+									songInfoElements[k].setAttribute('src', _config2.default.songs[idx][info]);
+									newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
+								} else {
+									aux2 = songInfoElements[k].outerHTML;
+									songInfoElements[k].innerHTML = _config2.default.songs[idx][info];
+									newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
+								}
+							}
+						}
+						finalDom.push(newinner);
+					}
+					playlistRepeaterElements[i].innerHTML = finalDom.join("\n");
+				}
+			}
+		}
+	}
+
+	/**
  	Returns the publically available functions
  	@TODO Re-order to order of methods in module
  */
@@ -1753,7 +1820,8 @@ var AmplitudeVisualSync = function () {
 		syncSongSliderLocation: syncSongSliderLocation,
 		syncVolumeSliderLocation: syncVolumeSliderLocation,
 		syncSongDuration: syncSongDuration,
-		syncSongsMetaData: syncSongsMetaData
+		syncSongsMetaData: syncSongsMetaData,
+		syncPlaylistMetaData: syncPlaylistMetaData
 	};
 }();
 
@@ -4256,6 +4324,7 @@ var AmplitudeInitializer = function () {
 	function rebindDisplay() {
 		_events2.default.initializeEvents();
 		_visual2.default.displaySongMetadata();
+		_visual2.default.syncPlaylistMetaData();
 	}
 
 	/**
@@ -4404,6 +4473,11 @@ var AmplitudeInitializer = function () {
   	Sets the meta data for the songs automatically.
   */
 		_visual2.default.syncSongsMetaData();
+
+		/*
+            Sets the meta data for the playlist repeater automatically.
+  */
+		_visual2.default.syncPlaylistMetaData();
 
 		/*
   	If the user has autoplay enabled, then begin playing the song. Everything should
@@ -5970,15 +6044,14 @@ var Amplitude = function () {
 		/*
   	Ensures the playlist is valid to push the song on to.
   */
-		if (_config2.default.playlists[playlist] != undefined) {
-			_config2.default.playlists[playlist].push(songIndex);
-
-			_helpers4.default.setNextPlaylist(playlist);
-
-			return _config2.default.playlists[playlist].length - 1;
-		} else {
-			return null;
+		if (_config2.default.playlists[playlist] == undefined) {
+			_config2.default.playlists[playlist] = [];
 		}
+		_config2.default.playlists[playlist].push(songIndex);
+
+		_helpers4.default.setNextPlaylist(playlist);
+
+		return _config2.default.playlists[playlist].length - 1;
 	}
 
 	/**
@@ -6055,11 +6128,6 @@ var Amplitude = function () {
 	function playPlaylistSongAtIndex(index, playlist) {
 		_core2.default.playPlaylistSongAtIndex(index, playlist);
 	}
-
-	/**
-  * @TODO: Implement Add Song To Playlist Functionality
-  */
-	function addSongToPlaylist(song, playlist) {}
 
 	/**
   * Allows the user to play whatever the active song is directly
