@@ -205,6 +205,7 @@ let AmplitudeInitializer = (function () {
 	function rebindDisplay(){
 		AmplitudeEvents.initializeEvents();
 		AmplitudeVisualSync.displaySongMetadata();
+		AmplitudeVisualSync.syncPlaylistMetaData();
 	}
 
 	/**
@@ -369,6 +370,11 @@ let AmplitudeInitializer = (function () {
 			Sets the meta data for the songs automatically.
 		*/
 		AmplitudeVisualSync.syncSongsMetaData();
+
+		/*
+            Sets the meta data for the playlist repeater automatically.
+		*/
+		AmplitudeVisualSync.syncPlaylistMetaData();
 
 		/*
 			If the user has autoplay enabled, then begin playing the song. Everything should

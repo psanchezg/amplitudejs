@@ -20,6 +20,7 @@
  * @property {object} 	config.callbacks								- The user can pass a JSON object with a key => value store of callbacks to be run at certain events.
  * @property {array} 		config.songs										- Contains all of the songs the user has passed to Amplitude to use.
  * @property {object} 	config.playlists								- Contains all of the playlists the user created.
+ * @property {object} 	config.playlist_markups								- Contains the HTML markup for the playlists before update.
  * @property {object} 	config.start_song 							- The index of the song that AmplitudeJS should start with.
  * @property {object} 	config.shuffled_playlists				- Will contain shuffled playlists.
  * @property {string} 	config.starting_playlist 				- The starting playlist the player will intiialize to.
@@ -69,6 +70,8 @@ module.exports = {
 	songs: [],
 
 	playlists: {},
+    
+    playlist_markups: {},
 
 	start_song: '',
 

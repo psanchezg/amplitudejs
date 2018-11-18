@@ -1037,6 +1037,70 @@ let AmplitudeVisualSync = (function() {
 	 			}
 		}
 	}
+    
+    /**
+     * Sets the playlist meta data for songs
+     */
+     function syncPlaylistMetaData(){
+    	 /*
+			Define the image meta data keys. These are managed separately
+			since we aren't actually changing the inner HTML of these elements.
+		*/
+		let imageMetaDataKeys 	= ['cover_art_url', 'station_art_url', 'podcast_episode_cover_art_url'];
+
+		/*
+			These are the ignored keys that we won't be worrying about displaying.
+			Every other key in the song object can be displayed.
+		*/
+		let ignoredKeys 		= ['url', 'live'];
+
+		/*
+			Get all of the song info elements
+		*/
+		let playlistRepeaterElements = document.querySelectorAll('[amplitude-playlist-repeater]');
+
+		/*
+			Iterate over all of the song info elements. We will either
+			set these to the new values, or clear them if the active song
+			doesn't have the info set.
+		*/
+        var index, info, idx, aux2, newinner, finalDom, songInfoElements;
+        for( let i = 0; i < playlistRepeaterElements.length; i++ ){
+            if (playlistRepeaterElements[i].getAttribute('amplitude-playlist-repeater') != null) {
+                if (config.playlist_markups[index] == undefined) {
+                    config.playlist_markups[index] = playlistRepeaterElements[i].innerHTML;
+                }
+                let inner = config.playlist_markups[index];
+                let dom = document.createRange().createContextualFragment(inner);
+                newinner = inner;
+                playlistRepeaterElements[i].innerHTML = '';
+                index = playlistRepeaterElements[i].getAttribute('amplitude-playlist-repeater');
+                if (config.playlists[index] != undefined) {
+                    finalDom = [];
+                    songInfoElements = dom.querySelectorAll('[amplitude-song-info]');                    
+                    for (let j = 0; j < config.playlists[index].length; j++) {
+                        idx = config.playlists[index][j];
+                        for (let k = 0; k < songInfoElements.length; k++) {
+                            info = songInfoElements[k].getAttribute('amplitude-song-info');
+                            if (config.songs[idx][info] != undefined) {
+                                if (imageMetaDataKeys.indexOf(info) >= 0) {
+                                    aux2 = songInfoElements[k].outerHTML;
+                                    songInfoElements[k].setAttribute('src', config.songs[idx][info]);
+                                    newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
+                                } else {
+                                    aux2 = songInfoElements[k].outerHTML;
+                                    songInfoElements[k].innerHTML = config.songs[idx][info]; 
+                                    newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
+                                }
+                            }
+                        }
+                        finalDom.push(newinner);
+                    }
+                    playlistRepeaterElements[i].innerHTML = finalDom.join("\n");
+                }
+            }
+    	}
+    }
 
 	/**
 		Returns the publically available functions
@@ -1069,7 +1133,8 @@ let AmplitudeVisualSync = (function() {
 		syncSongSliderLocation: syncSongSliderLocation,
 		syncVolumeSliderLocation: syncVolumeSliderLocation,
 		syncSongDuration: syncSongDuration,
-		syncSongsMetaData: syncSongsMetaData
+		syncSongsMetaData: syncSongsMetaData,
+		syncPlaylistMetaData: syncPlaylistMetaData
 	}
 })();
 
