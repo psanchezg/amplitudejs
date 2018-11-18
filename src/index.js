@@ -427,15 +427,14 @@ let Amplitude = (function () {
 			/*
 				Ensures the playlist is valid to push the song on to.
 			*/
-			if( config.playlists[playlist] != undefined ){
-				config.playlists[playlist].push( songIndex );
+			if( config.playlists[playlist] == undefined ){
+                config.playlists[playlist] = [];
+            }
+			config.playlists[playlist].push( songIndex );
 
-				AmplitudeEventsHelpers.setNextPlaylist( playlist );
+			AmplitudeEventsHelpers.setNextPlaylist( playlist );
 
-				return config.playlists[playlist].length - 1;
-			}else{
-				return null;
-			}
+			return config.playlists[playlist].length - 1;
 	 }
 
 	 /**
