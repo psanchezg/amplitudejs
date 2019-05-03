@@ -60,6 +60,15 @@ let AmplitudeInitializer = (function () {
 		AmplitudeHelpers.resetConfig();
 
 		/*
+			Initializes the user defined callbacks. This should be a JSON
+			object that contains a key->value store of the callback name
+			and the name of the function the user needs to call.
+		*/
+		config.callbacks = ( userConfig.callbacks != undefined ?
+							 					 userConfig.callbacks :
+							 				 	 {} );
+
+		/*
 			Initialize event handlers on init. This will clear any old
 			event handlers on the amplitude element and re-bind what is
 			necessary.

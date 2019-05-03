@@ -1079,6 +1079,7 @@ let AmplitudeVisualSync = (function() {
                     finalDom = [];
                     songInfoElements = dom.querySelectorAll('[amplitude-song-info]');                    
                     for (let j = 0; j < config.playlists[index].length; j++) {
+                        /*
                         idx = config.playlists[index][j];
                         for (let k = 0; k < songInfoElements.length; k++) {
                             info = songInfoElements[k].getAttribute('amplitude-song-info');
@@ -1094,6 +1095,7 @@ let AmplitudeVisualSync = (function() {
                                 }
                             }
                         }
+                        */
                         finalDom.push(newinner);
                     }
                     playlistRepeaterElements[i].innerHTML = finalDom.join("\n");

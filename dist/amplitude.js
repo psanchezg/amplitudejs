@@ -1766,21 +1766,23 @@ var AmplitudeVisualSync = function () {
 					finalDom = [];
 					songInfoElements = dom.querySelectorAll('[amplitude-song-info]');
 					for (var j = 0; j < _config2.default.playlists[index].length; j++) {
-						idx = _config2.default.playlists[index][j];
-						for (var k = 0; k < songInfoElements.length; k++) {
-							info = songInfoElements[k].getAttribute('amplitude-song-info');
-							if (_config2.default.songs[idx][info] != undefined) {
-								if (imageMetaDataKeys.indexOf(info) >= 0) {
-									aux2 = songInfoElements[k].outerHTML;
-									songInfoElements[k].setAttribute('src', _config2.default.songs[idx][info]);
-									newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
-								} else {
-									aux2 = songInfoElements[k].outerHTML;
-									songInfoElements[k].innerHTML = _config2.default.songs[idx][info];
-									newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
-								}
-							}
-						}
+						/*
+      idx = config.playlists[index][j];
+      for (let k = 0; k < songInfoElements.length; k++) {
+          info = songInfoElements[k].getAttribute('amplitude-song-info');
+          if (config.songs[idx][info] != undefined) {
+              if (imageMetaDataKeys.indexOf(info) >= 0) {
+                  aux2 = songInfoElements[k].outerHTML;
+                  songInfoElements[k].setAttribute('src', config.songs[idx][info]);
+                  newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
+              } else {
+                  aux2 = songInfoElements[k].outerHTML;
+                  songInfoElements[k].innerHTML = config.songs[idx][info]; 
+                  newinner = newinner.replace(aux2, songInfoElements[k].outerHTML);
+              }
+          }
+      }
+      */
 						finalDom.push(newinner);
 					}
 					playlistRepeaterElements[i].innerHTML = finalDom.join("\n");
@@ -4179,6 +4181,13 @@ var AmplitudeInitializer = function () {
 		_helpers2.default.resetConfig();
 
 		/*
+  	Initializes the user defined callbacks. This should be a JSON
+  	object that contains a key->value store of the callback name
+  	and the name of the function the user needs to call.
+  */
+		_config2.default.callbacks = userConfig.callbacks != undefined ? userConfig.callbacks : {};
+
+		/*
   	Initialize event handlers on init. This will clear any old
   	event handlers on the amplitude element and re-bind what is
   	necessary.
@@ -6029,7 +6038,7 @@ var Amplitude = function () {
   * @param {string} playlist		- Playlist we are adding the song to.
   * @returns {mixed} New index of song in playlist or null if no playlist exists
   */
-	function addSongToPlaylist(song, playlist) {
+	function addSongToPlaylist(song, playlist, play) {
 		/*
   	Ensures we have a songs array to push to. This is step 1.
   */
@@ -6049,7 +6058,9 @@ var Amplitude = function () {
 		}
 		_config2.default.playlists[playlist].push(songIndex);
 
-		_helpers4.default.setNextPlaylist(playlist);
+		if (play) {
+			_helpers4.default.setNextPlaylist(playlist);
+		}
 
 		return _config2.default.playlists[playlist].length - 1;
 	}

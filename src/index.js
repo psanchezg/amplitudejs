@@ -412,7 +412,7 @@ let Amplitude = (function () {
 	 * @param {string} playlist		- Playlist we are adding the song to.
 	 * @returns {mixed} New index of song in playlist or null if no playlist exists
 	 */
-	 function addSongToPlaylist( song, playlist ){
+	 function addSongToPlaylist( song, playlist, play ){
 		 	/*
 	 			Ensures we have a songs array to push to. This is step 1.
 	 		*/
@@ -432,7 +432,9 @@ let Amplitude = (function () {
             }
 			config.playlists[playlist].push( songIndex );
 
-			AmplitudeEventsHelpers.setNextPlaylist( playlist );
+            if(play){
+                AmplitudeEventsHelpers.setNextPlaylist( playlist );
+            }
 
 			return config.playlists[playlist].length - 1;
 	 }
